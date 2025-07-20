@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <h2>Grupos de Testes</h2>
+        <div class="list-group">
+            {% for group in test_groups %}
+            <a href="#" class="list-group-item list-group-item-action load-group" data-group="{{ group }}">{{ group
+                }}</a>
+            {% endfor %}
+        </div>
+        <button class="btn btn-primary mt-3">Novo Grupo</button>
+    </div>
+    <div class="col-md-8">
+        <h2 id="current-group-title">Selecione um Grupo</h2>
+        <div id="test-list-container">
+        </div>
+        <button id="run-selected-tests" class="btn btn-success mt-3" style="display: none;">Executar Testes
+            Selecionados</button>
+    </div>
+</div>
+<hr>
+<div class="row mt-4">
+    <h2>Resultados da Execução</h2>
+    <div id="results-container">
+    </div>
+</div>
+{% endblock %}

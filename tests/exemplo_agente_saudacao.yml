@@ -1,0 +1,40 @@
+- test_name: "Cenário 1: Usuário conhecido retorna saudação personalizada"
+  description: "Verifica se o agente cumprimenta um usuário existente pelo nome."
+  
+  # 1. O que mockar ANTES da chamada
+  mockserver_expectations:
+    - httpRequest:
+        method: "GET"
+        path: "/api/database/users/123"
+      httpResponse:
+        statusCode: 200
+        body:
+          nome: "Ana"
+          preferencia: "tecnologia"
+
+  # 2. A chamada que será feita para o seu agente de IA
+  agent_call:
+    method: "POST"
+    url: "http://localhost:5001/chat" # URL do seu agente de IA
+    headers:
+      Content-Type: "application/json"
+    body:
+      user_id: "123"
+      query: "Olá, tudo bem?"
+
+  # 3. O que verificar DEPOIS da chamada
+  mockserver_verifications:
+    - httpRequest:
+        method: "GET"
+        path: "/api/database/users/123"
+      times:
+        count: 1
+
+  # 4. O prompt para validar a resposta do agente com um LLM
+  llm_validation_prompt: >
+    Analise a resposta do agente. A resposta deve ser uma saudação amigável,
+    mencionar o nome "Ana" e não deve sugerir tópicos de economia.
+    Responda apenas com "true" ou "false".
+
+- test_name: "Cenário 2: Usuário desconhecido retorna saudação genérica"
+  # ... outra configuração de teste ...
