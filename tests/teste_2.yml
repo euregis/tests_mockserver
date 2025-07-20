@@ -1,4 +1,5 @@
 - test_name: Novo Teste
+  setup_steps: []
   mockserver_expectations:
   - httpRequest:
       method: GET
@@ -16,7 +17,7 @@
   mockserver_verifications:
   - httpRequest:
       method: GET
-      path: /api/database/users/1223
+      path: /api/database/users/123
     times:
       atLeast: 1
       atMost: 1

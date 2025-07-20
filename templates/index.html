@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="pt-br" data-bs-theme="dark">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,7 +8,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
-
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
         <div class="container-fluid">
@@ -23,11 +21,10 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5>Grupos de Testes</h5>
-                        <button class="btn btn-sm btn-success" id="new-group-btn" title="Novo Grupo"><i
-                                class="bi bi-plus-lg"></i> Novo</button>
+                        <button class="btn btn-sm btn-success" id="new-group-btn" title="Novo Grupo"><i class="bi bi-plus-lg"></i> Novo</button>
                     </div>
                     <div class="list-group list-group-flush" id="test-groups-list">
-                    </div>
+                        </div>
                 </div>
             </div>
 
@@ -36,22 +33,18 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h3 id="current-group-title"></h3>
                         <div>
-                            <button class="btn btn-danger" id="delete-group-btn" title="Excluir Grupo"><i
-                                    class="bi bi-trash"></i> Excluir Grupo</button>
-                            <button class="btn btn-primary" id="save-group-btn" title="Salvar Alterações"><i
-                                    class="bi bi-save"></i> Salvar Grupo</button>
+                             <button class="btn btn-danger" id="delete-group-btn" title="Excluir Grupo"><i class="bi bi-trash"></i> Excluir Grupo</button>
+                             <button class="btn btn-primary" id="save-group-btn" title="Salvar Alterações"><i class="bi bi-save"></i> Salvar Grupo</button>
                         </div>
                     </div>
-
+                    
                     <div id="test-list-container">
-                    </div>
-                    <button class="btn btn-outline-primary mt-2" id="add-test-btn"><i class="bi bi-plus-circle"></i>
-                        Adicionar Teste ao Grupo</button>
+                        </div>
+                    <button class="btn btn-outline-primary mt-2" id="add-test-btn"><i class="bi bi-plus-circle"></i> Adicionar Teste ao Grupo</button>
                     <hr>
-                    <button id="run-selected-tests-btn" class="btn btn-lg btn-success float-end"><i
-                            class="bi bi-play-fill"></i> Executar Testes Selecionados</button>
+                    <button id="run-selected-tests-btn" class="btn btn-lg btn-success float-end"><i class="bi bi-play-fill"></i> Executar Testes Selecionados</button>
                 </div>
-                <div id="welcome-message" class="text-center p-5">
+                 <div id="welcome-message" class="text-center p-5">
                     <h2 class="text-muted">Selecione ou crie um grupo de testes para começar.</h2>
                 </div>
             </div>
@@ -63,36 +56,33 @@
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h3>Resultados da Execução</h3>
                         <div>
-                            <button class="btn btn-sm btn-outline-secondary" id="export-json-btn"
-                                title="Exportar como JSON"><i class="bi bi-filetype-json"></i> Exportar JSON</button>
-                            <button class="btn btn-sm btn-outline-secondary" id="export-csv-btn"
-                                title="Exportar como CSV"><i class="bi bi-filetype-csv"></i> Exportar CSV</button>
+                            <button class="btn btn-sm btn-outline-secondary" id="export-json-btn" title="Exportar como JSON"><i class="bi bi-filetype-json"></i> Exportar JSON</button>
+                            <button class="btn btn-sm btn-outline-secondary" id="export-csv-btn" title="Exportar como CSV"><i class="bi bi-filetype-csv"></i> Exportar CSV</button>
                         </div>
                     </div>
                     <div id="results-container">
-                    </div>
+                        </div>
                 </div>
             </div>
         </div>
     </div>
-
+    
     <div class="modal fade" id="detailsModal" tabindex="-1">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="detailsModalTitle">Detalhes do Teste</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <pre><code id="detailsModalContent" class="language-json" style="white-space: pre-wrap;"></code></pre>
-                </div>
-            </div>
+      <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="detailsModalTitle">Detalhes do Teste</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <pre><code id="detailsModalContent" class="language-json" style="white-space: pre-wrap;"></code></pre>
+          </div>
         </div>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.33.0/src-min-noconflict/ace.js"></script>
     <script src="/static/js/main.js"></script>
 </body>
-
 </html>

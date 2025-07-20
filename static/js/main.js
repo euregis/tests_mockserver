@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
         editor.setOptions({
             fontSize: "14px",
             showPrintMargin: false,
-            useWorker: false // Desativa a validação de sintaxe para evitar erros em JSONs vazios
+            useWorker: false
         });
         editors[elementId] = editor;
     }
@@ -92,16 +92,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
                 <div class="card-body">
                     <div class="accordion" id="accordion-${testId}">
-                        ${renderAccordionItem(testId, 'expectations', '1. Expectations (MockServer)', test.mockserver_expectations || [])}
-                        ${renderAccordionItem(testId, 'agent-call', '2. Chamada ao Agente', test.agent_call || {})}
-                        ${renderAccordionItem(testId, 'verifications', '3. Verifications (MockServer)', test.mockserver_verifications || [])}
-                        ${renderAccordionItem(testId, 'llm-prompt', '4. Prompt de Validação (LLM)', test.llm_validation_prompt || "", 'text')}
+                        ${renderAccordionItem(testId, 'setup-steps', '1. Passos de Setup (Login, etc)', test.setup_steps || [])}
+                        ${renderAccordionItem(testId, 'expectations', '2. Expectations (MockServer)', test.mockserver_expectations || [])}
+                        ${renderAccordionItem(testId, 'agent-call', '3. Chamada Principal ao Agente', test.agent_call || {})}
+                        ${renderAccordionItem(testId, 'verifications', '4. Verifications (MockServer)', test.mockserver_verifications || [])}
+                        ${renderAccordionItem(testId, 'llm-prompt', '5. Prompt de Validação (LLM)', test.llm_validation_prompt || "", 'text')}
                     </div>
                 </div>
             </div>
         `;
         testListContainer.insertAdjacentHTML('beforeend', template);
 
+        createEditor(`${testId}-setup-steps-editor`, test.setup_steps || []);
         createEditor(`${testId}-expectations-editor`, test.mockserver_expectations || []);
         createEditor(`${testId}-agent-call-editor`, test.agent_call || {});
         createEditor(`${testId}-verifications-editor`, test.mockserver_verifications || []);
@@ -179,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function () {
             data.forEach(renderTest);
             editorContainer.classList.remove('d-none');
             welcomeMessage.classList.add('d-none');
-            loadGroups(); // Recarrega para destacar o ativo
+            loadGroups();
         } catch (error) {
             alert(`Erro ao carregar o grupo '${groupName}': ${error.message}`);
         }
@@ -190,18 +192,20 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('#test-list-container .card').forEach((card) => {
             const testIndex = card.dataset.testIndex;
 
-            let expectations, agentCall, verifications;
+            let setupSteps, expectations, agentCall, verifications;
             try {
+                setupSteps = JSON.parse(editors[`test-${testIndex}-setup-steps-editor`].getValue() || '[]');
                 expectations = JSON.parse(editors[`test-${testIndex}-expectations-editor`].getValue() || '[]');
                 agentCall = JSON.parse(editors[`test-${testIndex}-agent-call-editor`].getValue() || '{}');
                 verifications = JSON.parse(editors[`test-${testIndex}-verifications-editor`].getValue() || '[]');
             } catch (e) {
-                alert(`Erro de sintaxe JSON no teste '${card.querySelector('.test-name-input').value}'. Por favor, corrija antes de salvar. Erro: ${e.message}`);
-                throw e; // Interrompe a função
+                alert(`Erro de sintaxe JSON no teste '${card.querySelector('.test-name-input').value}'. Por favor, corrija. Erro: ${e.message}`);
+                throw e;
             }
 
             const test = {
                 test_name: card.querySelector('.test-name-input').value,
+                setup_steps: setupSteps,
                 mockserver_expectations: expectations,
                 agent_call: agentCall,
                 mockserver_verifications: verifications,
@@ -239,12 +243,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(() => alert(`Grupo '${currentGroupName}' salvo com sucesso!`))
                 .catch(error => alert(`Erro ao salvar: ${error.message}`));
         } catch (e) {
-            // O erro já foi mostrado pelo alert em collectDataFromDOM
+            // O erro já foi mostrado pelo alert
         }
     });
 
     document.getElementById('delete-group-btn').addEventListener('click', () => {
-        if (!currentGroupName || !confirm(`Tem certeza que deseja excluir o grupo '${currentGroupName}'? Esta ação não pode ser desfeita.`)) return;
+        if (!currentGroupName || !confirm(`Tem certeza que deseja excluir o grupo '${currentGroupName}'?`)) return;
         apiCall(`/api/test-groups/${currentGroupName}`, 'DELETE')
             .then(() => {
                 selectGroup(null);
@@ -255,13 +259,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById('add-test-btn').addEventListener('click', () => {
         const newTest = {
-            test_name: "Novo Teste",
+            test_name: "Novo Teste Encadeado",
+            setup_steps: [],
             mockserver_expectations: [],
             agent_call: {},
             mockserver_verifications: [],
             llm_validation_prompt: ""
         };
-        // Encontra o maior índice atual e adiciona 1
         const newIndex = document.querySelectorAll('#test-list-container .card').length;
         renderTest(newTest, newIndex);
     });
@@ -271,7 +275,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const card = e.target.closest('.card');
             if (confirm('Tem certeza que deseja remover este teste?')) {
                 card.remove();
-                // Reatribui os índices para manter a consistência
                 document.querySelectorAll('#test-list-container .card').forEach((c, i) => c.dataset.testIndex = i);
             }
         }
@@ -282,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             testsFromDOM = collectDataFromDOM();
         } catch (e) {
-            return; // Para a execução se houver erro de JSON
+            return;
         }
 
         const testsToRun = [];
@@ -296,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         resultsSection.classList.remove('d-none');
-        resultsContainer.innerHTML = '<div class="text-center p-4"><div class="spinner-border" role="status"><span class="visually-hidden">Executando...</span></div><p>Executando testes...</p></div>';
+        resultsContainer.innerHTML = '<div class="text-center p-4"><div class="spinner-border" role="status"></div><p class="mt-2">Executando testes...</p></div>';
 
         try {
             const results = await apiCall('/api/run', 'POST', { tests: testsToRun });
