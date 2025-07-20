@@ -1,0 +1,23 @@
+- test_name: Novo Teste
+  mockserver_expectations:
+  - httpRequest:
+      method: GET
+      path: /api/database/users/123
+    httpResponse:
+      body:
+        nome: Ana
+        preferencia: tecnologia
+      statusCode: 200
+  agent_call:
+    headers:
+      Content-Type: application/json
+    method: GET
+    url: http://localhost:1080/api/database/users/123
+  mockserver_verifications:
+  - httpRequest:
+      method: GET
+      path: /api/database/users/1223
+    times:
+      atLeast: 1
+      atMost: 1
+  llm_validation_prompt: ''
